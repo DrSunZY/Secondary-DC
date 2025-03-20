@@ -1,4 +1,4 @@
-setwd("~/Documents/2-Work/R/DC_MachineLearning")
+setwd("~/Desktop/DC_Machinelearning/R")
 
 library(readxl)
 library(mlr3)
@@ -49,8 +49,8 @@ save(clinical_z, file = "temp_clinical_z.RData")
 #####
 load("temp_splits.RData")
 
-splits$train 
-splits$test 
+splits$train # for level_1 model construction and validation
+splits$test # for level_2 test
 
 # initiate the new task with training data
 task_real = as_task_classif(clinical_z[splits$train,], target = "outcome")
@@ -71,11 +71,11 @@ learners = lrns(c("classif.randomForest",
                   "classif.kknn", 
                   "classif.ctree", 
                   "classif.gbm"), 
-                predict_type="prob") 
+                predict_type="prob") # svm does not support factor type
 
 
 
-keep = names(head(flt_importance$scores, 1)) 
+keep = names(head(flt_importance$scores, 28)) 
 print(length(keep))
 task_real = as_task_classif(clinical_z[splits$train,], target = "outcome")
 
@@ -86,7 +86,7 @@ task_real = as_task_classif(clinical_z[splits$train,], target = "outcome")
   grid= benchmark_grid(
     task= task_real,
     learners= learners,
-    resamplings = rsmp("loo") 
+    resamplings = rsmp("loo") # leave one out method
   )
   
   bmr = benchmark(grid, store_models = TRUE)
